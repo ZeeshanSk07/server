@@ -1,63 +1,32 @@
-const express = require('express');
-const mongoose = require('mongoose');
-const user = require('./routes/user');
-const jobRoute = require('./routes/job');
-const applicationRoute = require('./routes/application');
-const cors = require('cors');
-const dotenv = require('dotenv').config();
+const { getAllApplications, applyApplication } = require('../controllers/applicationcontroller');
+const router = require('express').Router();
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
 
+// Create uploads directory if it doesn't exist
+const uploadDir = path.join(__dirname, '../uploads/resumes');
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
 
-const Port = 4000;
-
-const app = express();
-app.use(cors());
-app.use(express.json());
-//what is synchronisation
-//what is shell scripting? 
-//cetails about ipaddress
-//Whsat is sudo in linux?
-//s
-
-
-
-
-mongoose.connect(process.env.MONGO_URL)
-    .then(() => {
-        console.log('Database connected');
-    })
-    .catch(err => {
-        console.log('Error connecting to database:', err);
+// Configure multer storage
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, uploadDir); // Set the correct destination directory
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + path.extname(file.originalname)); // Generate a unique file name with the correct extension
+  },
 });
 
-app.use('/user', user);
-app.use('/job', jobRoute);
-app.use('/application', applicationRoute);
+const upload = multer({ storage: storage });
 
-app.use((err, req, res, next) => {
-    console.error("Error occurred:", err); // Log error messages
-    res.status(500).json({
-        message: "An error occurred",
-        error: err.message // Send back error details
-    });
-});
+// Serve resumes statically from the uploads/resumes directory
+router.use('/uploads/resumes', express.static(path.join(__dirname, '../uploads/resumes')));
 
-app.get('/health', (req, res) => {
-    res.json({
-        message: ' API is working fine',
-        status: 'Working',
-        date: new Date().toLocaleDateString()
-    });
-})
+// Routes
+router.get('/', getAllApplications);  // Removed () to pass function reference
+router.post('/apply', upload.single('resume'), applyApplication);  // Removed () to pass function reference
 
-
-
-app.use("*", (req, res) => {
-    res.status(404).json({
-        message: 'Endpoint not found',
-        status: 'Error',
-    });
-});
-  
-app.listen(Port, () => {
-  console.log(`Server is running on port ${Port}`);
-});
+module.exports = router;
