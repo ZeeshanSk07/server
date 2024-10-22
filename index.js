@@ -5,21 +5,13 @@ const jobRoute = require('./routes/job');
 const applicationRoute = require('./routes/application');
 const cors = require('cors');
 const dotenv = require('dotenv').config();
-
+const path = require('path');
 
 const Port = 4000;
 
 const app = express();
 app.use(cors());
 app.use(express.json());
-//what is synchronisation
-//what is shell scripting? 
-//cetails about ipaddress
-//Whsat is sudo in linux?
-//s
-
-
-
 
 mongoose.connect(process.env.MONGO_URL)
     .then(() => {
