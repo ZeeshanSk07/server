@@ -27,13 +27,14 @@ const applyApplication = async (req, res) => {
     }
 
     const resumeUrl = req.file.path; // The file path from multer
-
+    const resumeFilename = path.basename(resumeUrl); 
+    
     const newApplication = new Application({
       jobId,
       name,
       email,
       jobrole,
-      resumeUrl,
+      resumeUrl : resumeFilename,
     });
 
     await newApplication.save();
