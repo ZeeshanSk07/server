@@ -3,6 +3,7 @@ const router = require('express').Router();
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const app = express();
 
 // Create uploads directory if it doesn't exist
 const uploadDir = path.join(__dirname, '../uploads/resumes');
@@ -23,7 +24,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 // Serve resumes statically from the uploads/resumes directory
-router.use('/uploads/resumes', express.static(path.join(__dirname, '../uploads/resumes')));
+app.use('/uploads/resumes', express.static(path.join(__dirname, '../uploads/resumes')));
 
 // Routes
 router.get('/', getAllApplications);  // Removed () to pass function reference
