@@ -3,12 +3,15 @@ const router = require('express').Router();
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const app = express();
 
+// Create uploads directory if it doesn't exist
 const uploadDir = path.join(__dirname, '../uploads/resumes');
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
 
+// Configure multer storage
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, uploadDir); // Set the correct destination directory
@@ -20,8 +23,11 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
+// Serve resumes statically from the uploads/resumes directory
+app.use('/uploads/resumes', express.static(path.join(__dirname, '../uploads/resumes')));
 
-router.get('/', getAllApplications());
-router.post('/apply', upload.single('resume') , applyApplication());
+// Routes
+router.get('/', getAllApplications);  // Removed () to pass function reference
+router.post('/apply', upload.single('resume'), applyApplication);  // Removed () to pass function reference
 
 module.exports = router;
