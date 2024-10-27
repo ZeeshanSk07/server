@@ -20,10 +20,11 @@ mongoose.connect(process.env.MONGO_URL)
     .catch(err => {
         console.log('Error connecting to database:', err);
 });
-app.use('/uploads/resumes', express.static(path.join(__dirname, 'uploads/resumes')));
+
 app.use('/user', user);
 app.use('/job', jobRoute);
 app.use('/application', applicationRoute);
+app.use('/uploads/resumes', express.static(path.join(__dirname, 'uploads')));
 
 app.use((err, req, res, next) => {
     console.error("Error occurred:", err); // Log error messages
